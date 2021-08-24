@@ -34,7 +34,8 @@ pitch_21_totals %>%
   geom_smooth(aes(color = record), se = FALSE)+
   theme_minimal()+
   scale_color_manual(values = c("dodgerblue3", "goldenrod2"))+
-  labs(x="", y="spin rate (rpm)", color = "", title = "<strong><span style='color:goldenrod2'>The MLB teams with the 5 best records</span></strong></b> since the All-Star break tend to have pitched", 
+  geom_vline(xintercept = as.Date("2021-07-14"), linetype = "dashed", color = "red")+
+  labs(x="", y="spin rate (rpm)", color = "", title = "<strong><span style='color:goldenrod2'>The MLB teams with the 5 best records</span></strong></b> since the <strong><span style='color:red'>All-Star Break</span></strong></b> tend to have pitched", 
        subtitle = "with higher spin rates than <strong><span style='color:dodgerblue3'>the teams with the 5 worst records</span></strong></b> since the break")+
   theme(plot.title.position = "plot", 
         legend.position = "none",
@@ -45,10 +46,10 @@ pitch_21_totals %>%
         panel.grid.minor.y = element_blank(),
         axis.text = element_text(family = "mono", face = "bold", size=9), 
         axis.title = element_text(family = "mono", face = "bold", size=9))+
-  annotate(geom="text",x=as.Date("2021-06-15"), y=2520,label="Dodgers", family = "mono", fontface="bold", cex = 3.3, color = "goldenrod2")+
+  annotate(geom="text",x=as.Date("2021-05-25"), y=2520,label="Dodgers", family = "mono", fontface="bold", cex = 3.3, color = "goldenrod2")+
    annotate(geom="text",x=as.Date("2021-06-15"), y=2365,label="Pirates", family = "mono", fontface="bold", cex = 3.3, color = "dodgerblue3")+
   annotate(geom="text",x=as.Date("2021-04-25"), y=2190,label="Rangers", family = "mono", fontface="bold", cex = 3.3, color = "dodgerblue3")+
-  annotate(geom="text",x=as.Date("2021-07-10"), y=2550,label= "Best records: \nYankees \nBrewers \nRays \nBraves \nDodgers", family = "mono", fontface="bold", cex = 3.3, color = "goldenrod2")+
+  annotate(geom="text",x=as.Date("2021-07-02"), y=2550,label= "Best records: \nYankees \nBrewers \nRays \nBraves \nDodgers", family = "mono", fontface="bold", cex = 3.3, color = "goldenrod2")+
   annotate(geom="text",x=as.Date("2021-08-10"), y=2550,label="Worst records: \nRangers \nCubs \nOrioles \nPirates \nMarlins", family = "mono", fontface="bold", cex = 3.3, color = "dodgerblue3")
 ```
 
@@ -64,11 +65,12 @@ bat_21_totals %>%
   ggplot(aes(x=game_week, y=attack_angle)) +
   geom_smooth(aes(color = record), se=FALSE, size=2)+
   geom_line(aes(group=team, color = record), stat = "smooth", alpha= 0.2, size=1.25, se = FALSE)+
+  geom_vline(xintercept = 28, linetype = "dashed", color = "red")+
   theme_minimal()+
   scale_color_manual(values = c("dodgerblue3", "goldenrod2"))+
   scale_x_continuous(breaks = c(15, 19, 23, 27, 31), labels = c("April", "May", "June", "July", "August"))+
-  labs(x="", y="attack angle", color = "", title = "<strong><span style='color:goldenrod2'>The five highest performing teams</span></strong></b> since the break on average have used a higher", 
-  subtitle = "attack angle than <strong><span style='color:dodgerblue3'>the teams that have been performing poorly </span></strong></b> since the break")+
+  labs(x="", y="attack angle", color = "", title = "<strong><span style='color:goldenrod2'>The five highest performing teams</span></strong></b> since the <strong><span style='color:red'>break</span></strong></b> on average have used a higher", 
+  subtitle = "attack angle than <strong><span style='color:dodgerblue3'>the teams that have been performing poorly </span></strong></b>since the <strong><span style='color:red'>break</span></strong></b>")+
   theme(plot.title.position = "plot", 
         legend.position = "none",
         plot.title = element_markdown(family = "mono", face = "bold", size = 10),
@@ -97,10 +99,11 @@ plate_appearances %>%
   ggplot(aes(x=game_date, y=bb_rate)) +
   geom_smooth(aes(color = record), se=FALSE, size=2)+
   geom_line(aes(group=team, color = record), stat = "smooth", alpha= 0.2, size=1.25, se = FALSE)+
+  geom_vline(xintercept = as.Date("2021-07-14"), linetype = "dashed", color = "red")+
   theme_minimal()+
   scale_color_manual(values = c("dodgerblue3", "goldenrod2"))+
   labs(x="", y="walks/plate appearance", color = "", title = "The gap in walks/plate appearance has widened for<strong><span style='color:goldenrod2'> the 5 teams with the best records</span></strong></b>", 
-  subtitle = "since the Allstar break versus the <strong><span style='color:dodgerblue3'>5 teams with the poorest records</span></strong></b> since the break")+
+  subtitle = "since the <strong><span style='color:red'>All-Star Break</span></strong></b> versus the <strong><span style='color:dodgerblue3'>5 teams with the worst records</span></strong></b> since the break")+
   theme(plot.title.position = "plot", 
         legend.position = "none",
         plot.title = element_markdown(family = "mono", face = "bold", size = 10),
