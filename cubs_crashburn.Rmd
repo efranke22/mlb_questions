@@ -1,0 +1,112 @@
+---
+title: "What has contributed to the Cubs' 2021 crash and burn?"
+author: "Erin Franke"
+date: "8/21/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(baseballr)
+library(gghighlight)
+library(lubridate)
+library(ggtext)
+
+#load in pitcher and batter data for the teams with the 5 best records since the allstar break and the teams with the 5 worst records 
+pitch_21_totals = read_rds("data/pitch21_totals.rds") %>%
+  mutate(record = as.factor(record))
+bat_21_totals = read_rds("data/bat21_totals.rds") %>%
+  mutate(record = as.factor(record))
+```
+
+Goal: look at how certain stats vary between the teams with the 5 best and 5 worst records since the 2021 All-Star break.
+
+Graph 1: Pitcher spin rate
+```{r}
+pitch_21_totals %>%
+  group_by(game_date, team, record) %>%
+  summarize(avg_spin_rate = mean(release_spin_rate, na.rm = TRUE)) %>%
+  ggplot(aes(game_date, avg_spin_rate,group=team))+
+  geom_smooth(aes(color = record), se = FALSE)+
+  theme_minimal()+
+  scale_color_manual(values = c("dodgerblue3", "goldenrod2"))+
+  labs(x="", y="spin rate (rpm)", color = "", title = "<strong><span style='color:goldenrod2'>The MLB teams with the 5 best records</span></strong></b> since the Allstar break tend to have pitched", 
+       subtitle = "with higher spin rates than <strong><span style='color:dodgerblue3'>the teams with the 5 worst records</span></strong></b> since the break")+
+  theme(plot.title.position = "plot", 
+        legend.position = "none",
+        plot.title = element_markdown(family = "mono", face = "bold", size = 10),
+        plot.subtitle = element_markdown(family = "mono", face = "bold", size = 10),
+        panel.grid.major.x = element_blank(), 
+        panel.grid.minor.x = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        axis.text = element_text(family = "mono", face = "bold", size=9), 
+        axis.title = element_text(family = "mono", face = "bold", size=9))+
+  annotate(geom="text",x=as.Date("2021-06-15"), y=2520,label="Dodgers", family = "mono", fontface="bold", cex = 3.3, color = "goldenrod2")+
+   annotate(geom="text",x=as.Date("2021-06-15"), y=2365,label="Pirates", family = "mono", fontface="bold", cex = 3.3, color = "dodgerblue3")+
+  annotate(geom="text",x=as.Date("2021-04-25"), y=2190,label="Rangers", family = "mono", fontface="bold", cex = 3.3, color = "dodgerblue3")
+```
+
+Graph 2: Attack angle
+```{r}
+bat_21_totals %>%
+  filter(description == "hit_into_play") %>%
+  mutate(game_week = week(game_date)) %>%
+  group_by(game_week, team, record) %>% 
+  filter(launch_speed <= 120 -.02 * abs(launch_angle - 12)^1.7) %>%
+  filter(launch_speed >= quantile(launch_speed, .9, na.rm = TRUE)) %>%
+  summarize(attack_angle = median(launch_angle)) %>%
+  ggplot(aes(x=game_week, y=attack_angle)) +
+  geom_smooth(aes(color = record), se=FALSE, size=2)+
+  geom_line(aes(group=team, color = record), stat = "smooth", alpha= 0.2, size=1.25, se = FALSE)+
+  theme_minimal()+
+  scale_color_manual(values = c("dodgerblue3", "goldenrod2"))+
+  scale_x_continuous(breaks = c(15, 19, 23, 27, 31), labels = c("April", "May", "June", "July", "August"))+
+  labs(x="", y="attack angle", color = "", title = "<strong><span style='color:goldenrod2'>The five highest performing teams</span></strong></b> since the break on average have used a higher", 
+  subtitle = "attack angle than <strong><span style='color:dodgerblue3'>the teams that have been performing poorly </span></strong></b> since the break")+
+  theme(plot.title.position = "plot", 
+        legend.position = "none",
+        plot.title = element_markdown(family = "mono", face = "bold", size = 11),
+        plot.subtitle = element_markdown(family = "mono", face = "bold", size = 11),
+        panel.grid.major.x = element_blank(), 
+        panel.grid.minor.x = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        axis.text = element_text(family = "mono", face = "bold", size=9), 
+        axis.title = element_text(family = "mono", face = "bold", size=9))
+```
+
+Graph 3: Walks/plate appearance
+```{r}
+walks <- bat_21_totals %>%
+  group_by(game_date, team, record) %>%
+  filter(events %in% c("walk")) %>%
+  count() %>%
+  rename(bb=n)
+plate_appearances <- bat_21_totals %>%
+  mutate(PA_id = paste(game_pk, at_bat_number, sep = "-")) %>%
+  group_by(game_date, team, record) %>%
+  summarise(n_pa = length(unique(PA_id)))
+plate_appearances %>%
+  inner_join(walks, by = c("team", "game_date", "record")) %>%
+  mutate(bb_rate = bb/n_pa) %>%
+  ggplot(aes(x=game_date, y=bb_rate)) +
+  geom_smooth(aes(color = record), se=FALSE, size=2)+
+  geom_line(aes(group=team, color = record), stat = "smooth", alpha= 0.2, size=1.25, se = FALSE)+
+  theme_minimal()+
+  scale_color_manual(values = c("dodgerblue3", "goldenrod2"))+
+  labs(x="", y="walks/plate appearance", color = "", title = "The gap in walks/plate appearance has widened for<strong><span style='color:goldenrod2'> the 5 teams with the best records</span></strong></b>", 
+  subtitle = "since the Allstar break versus the <strong><span style='color:dodgerblue3'>5 teams with the poorest records</span></strong></b> since the break")+
+  theme(plot.title.position = "plot", 
+        legend.position = "none",
+        plot.title = element_markdown(family = "mono", face = "bold", size = 10),
+        plot.subtitle = element_markdown(family = "mono", face = "bold", size = 10),
+        panel.grid.major.x = element_blank(), 
+        panel.grid.minor.x = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        axis.text = element_text(family = "mono", face = "bold", size=9), 
+        axis.title = element_text(family = "mono", face = "bold", size=9))
+```
+
