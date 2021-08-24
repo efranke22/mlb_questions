@@ -1,12 +1,12 @@
 ---
-title: "What has contributed to the Cubs' 2021 crash and burn?"
+title: "MLB: What is making the bad teams bad and the good teams good?"
 author: "Erin Franke"
 date: "8/21/2021"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning=FALSE)
 ```
 
 ```{r}
@@ -34,7 +34,7 @@ pitch_21_totals %>%
   geom_smooth(aes(color = record), se = FALSE)+
   theme_minimal()+
   scale_color_manual(values = c("dodgerblue3", "goldenrod2"))+
-  labs(x="", y="spin rate (rpm)", color = "", title = "<strong><span style='color:goldenrod2'>The MLB teams with the 5 best records</span></strong></b> since the Allstar break tend to have pitched", 
+  labs(x="", y="spin rate (rpm)", color = "", title = "<strong><span style='color:goldenrod2'>The MLB teams with the 5 best records</span></strong></b> since the All-Star break tend to have pitched", 
        subtitle = "with higher spin rates than <strong><span style='color:dodgerblue3'>the teams with the 5 worst records</span></strong></b> since the break")+
   theme(plot.title.position = "plot", 
         legend.position = "none",
@@ -47,7 +47,9 @@ pitch_21_totals %>%
         axis.title = element_text(family = "mono", face = "bold", size=9))+
   annotate(geom="text",x=as.Date("2021-06-15"), y=2520,label="Dodgers", family = "mono", fontface="bold", cex = 3.3, color = "goldenrod2")+
    annotate(geom="text",x=as.Date("2021-06-15"), y=2365,label="Pirates", family = "mono", fontface="bold", cex = 3.3, color = "dodgerblue3")+
-  annotate(geom="text",x=as.Date("2021-04-25"), y=2190,label="Rangers", family = "mono", fontface="bold", cex = 3.3, color = "dodgerblue3")
+  annotate(geom="text",x=as.Date("2021-04-25"), y=2190,label="Rangers", family = "mono", fontface="bold", cex = 3.3, color = "dodgerblue3")+
+  annotate(geom="text",x=as.Date("2021-07-10"), y=2550,label= "Best records: \nYankees \nBrewers \nRays \nBraves \nDodgers", family = "mono", fontface="bold", cex = 3.3, color = "goldenrod2")+
+  annotate(geom="text",x=as.Date("2021-08-10"), y=2550,label="Worst records: \nRangers \nCubs \nOrioles \nPirates \nMarlins", family = "mono", fontface="bold", cex = 3.3, color = "dodgerblue3")
 ```
 
 Graph 2: Attack angle
@@ -69,8 +71,8 @@ bat_21_totals %>%
   subtitle = "attack angle than <strong><span style='color:dodgerblue3'>the teams that have been performing poorly </span></strong></b> since the break")+
   theme(plot.title.position = "plot", 
         legend.position = "none",
-        plot.title = element_markdown(family = "mono", face = "bold", size = 11),
-        plot.subtitle = element_markdown(family = "mono", face = "bold", size = 11),
+        plot.title = element_markdown(family = "mono", face = "bold", size = 10),
+        plot.subtitle = element_markdown(family = "mono", face = "bold", size = 10),
         panel.grid.major.x = element_blank(), 
         panel.grid.minor.x = element_blank(),
         panel.grid.minor.y = element_blank(),
